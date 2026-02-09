@@ -1,69 +1,90 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Slot Coin PRO</title>
+<title>Slot Coin SUPER PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
   font-family: Arial;
   text-align:center;
-  background:linear-gradient(180deg,#000,#300);
+  background:black;
   color:white;
   padding-top:20px;
 }
 h1 {color:gold;}
-.slot-box {
+
+.slot-machine {
+  display:flex;
+  justify-content:center;
+  gap:10px;
   font-size:70px;
-  background:black;
+  background:#111;
   padding:20px;
-  border:3px solid gold;
+  border:4px solid gold;
   border-radius:15px;
-  display:inline-block;
-  width:250px;
+  width:280px;
+  margin:auto;
 }
+
+.reel {
+  width:80px;
+  height:80px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px solid red;
+  background:black;
+  border-radius:10px;
+}
+
 button {
-  padding:15px 30px;
-  font-size:20px;
+  padding:12px 25px;
+  font-size:18px;
   background:red;
   color:white;
   border:none;
   border-radius:10px;
-  margin-top:15px;
+  margin:10px;
 }
 button:hover {background:darkred;}
+
+.win {
+  box-shadow:0 0 20px gold;
+}
 </style>
 </head>
 <body>
 
-<h1>🎰 SLOT COIN PRO 🎰</h1>
+<h1>🎰 SLOT COIN SUPER PRO 🎰</h1>
 <h2>💰 Coin: <span id="coin">100</span></h2>
 
-<div class="slot-box" id="slot">🍒 🍋 ⭐</div>
+<div class="slot-machine" id="machine">
+  <div class="reel" id="r1">🍒</div>
+  <div class="reel" id="r2">🍋</div>
+  <div class="reel" id="r3">⭐</div>
+</div>
 
-<br>
 <button onclick="spin()">SPIN (5 Coin)</button>
+<button onclick="autoSpin()">AUTO SPIN</button>
 <button onclick="resetCoin()">RESET COIN</button>
 
 <script>
-let symbols = ["🍒","🍋","⭐","💎","7️⃣"];
-
+const symbols = ["🍒","🍋","⭐","💎","7️⃣"];
 let coin = localStorage.getItem("coin") ? parseInt(localStorage.getItem("coin")) : 100;
 document.getElementById("coin").innerHTML = coin;
 
+let auto = false;
+
 function spin(){
-  if(coin < 5){
-    alert("Coin habis!");
-    return;
-  }
-
+  if(coin < 5){ alert("Coin habis!"); return; }
   coin -= 5;
+  saveCoin();
 
-  let slot = document.getElementById("slot");
+  let reels = ["r1","r2","r3"];
   let interval = setInterval(()=>{
-    slot.innerHTML =
-      symbols[Math.floor(Math.random()*symbols.length)]+" "+
-      symbols[Math.floor(Math.random()*symbols.length)]+" "+
-      symbols[Math.floor(Math.random()*symbols.length)];
+    reels.forEach(id=>{
+      document.getElementById(id).innerHTML = symbols[Math.floor(Math.random()*symbols.length)];
+    });
   },100);
 
   setTimeout(()=>{
@@ -73,15 +94,21 @@ function spin(){
     let b = symbols[Math.floor(Math.random()*symbols.length)];
     let c = symbols[Math.floor(Math.random()*symbols.length)];
 
-    slot.innerHTML = a+" "+b+" "+c;
+    document.getElementById("r1").innerHTML = a;
+    document.getElementById("r2").innerHTML = b;
+    document.getElementById("r3").innerHTML = c;
+
+    let machine = document.getElementById("machine");
+    machine.classList.remove("win");
 
     if(a==b && b==c){
-      alert("🎉 JACKPOT! +50 Coin");
-      coin += 50;
+      coin += 100;
+      machine.classList.add("win");
+      alert("🎉 SUPER JACKPOT +100 COIN!");
+      saveCoin();
     }
 
-    saveCoin();
-  },1000);
+  },1200);
 }
 
 function saveCoin(){
@@ -93,6 +120,22 @@ function resetCoin(){
   coin = 100;
   saveCoin();
   alert("Coin reset ke 100");
+}
+
+function autoSpin(){
+  auto = !auto;
+  if(auto){
+    alert("Auto Spin ON");
+    autoLoop();
+  } else {
+    alert("Auto Spin OFF");
+  }
+}
+
+function autoLoop(){
+  if(!auto) return;
+  spin();
+  setTimeout(autoLoop,1500);
 }
 </script>
 
