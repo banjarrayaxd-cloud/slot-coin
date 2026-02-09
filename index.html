@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gates of Olympus Login</title>
+<title>Gates of Olympus Ultra Real Login</title>
 <style>
-body {margin:0;font-family:Arial;background:black;color:white;text-align:center;}
+body{margin:0;font-family:Arial;background:black;color:white;text-align:center;}
 h1{color:gold;}
 input,button{padding:10px;margin:5px;font-size:16px;border-radius:8px;}
 button{background:gold;border:none;}
@@ -17,7 +17,7 @@ button:hover{background:orange;}
 </head>
 <body>
 
-<h1>⚡ Gates of Olympus Login ⚡</h1>
+<h1>⚡ Gates of Olympus Ultra Real ⚡</h1>
 
 <div id="loginForm">
   <input type="text" id="username" placeholder="Username"><br>
@@ -28,50 +28,58 @@ button:hover{background:orange;}
 
 <div id="game">
 <h2>💰 Coin: <span id="coin">1000</span></h2>
-<h3>🔥 Free Spin: <span id="free">0</span></h3>
+<h3>🔥 Free Spins: <span id="free">0</span></h3>
 
 <div id="machine">
   <div class="reel" id="r1">🍒</div>
   <div class="reel" id="r2">🍋</div>
   <div class="reel" id="r3">⭐</div>
+  <div class="reel" id="r4">💎</div>
+  <div class="reel" id="r5">⚡</div>
 </div>
 
-<button onclick="spin()">SPIN (10)</button>
+<div class="controls">
+<button onclick="spin()">SPIN</button>
 <button onclick="buyFreeSpin()">BUY FREE SPIN</button>
 <button onclick="resetCoin()">RESET</button>
+</div>
+
 <div class="bigwin" id="bigwin">🎉 BIG WIN 🎉</div>
 </div>
 
 <script>
 let currentUser="";
 
-// Simpan user: localStorage["users"] = JSON.stringify({username:{password:..,coin:..,free:..}})
+// Simpan semua user: localStorage["users"] = JSON.stringify({username:{password, coin, free}})
 if(!localStorage.users) localStorage.users=JSON.stringify({});
 
 function register(){
-  let u=document.getElementById("username").value;
-  let p=document.getElementById("password").value;
-  if(!u||!p){alert("Isi username & password");return;}
+  let u=document.getElementById("username").value.trim();
+  let p=document.getElementById("password").value.trim();
+  if(!u||!p){alert("Isi username & password"); return;}
   let users=JSON.parse(localStorage.users);
   if(users[u]){alert("Username sudah ada"); return;}
   users[u]={password:p,coin:1000,free:0};
   localStorage.users=JSON.stringify(users);
-  alert("Daftar berhasil!");
+  alert("Daftar berhasil! Silahkan login");
 }
 
 function login(){
-  let u=document.getElementById("username").value;
-  let p=document.getElementById("password").value;
+  let u=document.getElementById("username").value.trim();
+  let p=document.getElementById("password").value.trim();
   let users=JSON.parse(localStorage.users);
-  if(!users[u] || users[u].password!==p){alert("Login gagal");return;}
+  if(!users[u]||users[u].password!==p){alert("Login gagal"); return;}
   currentUser=u;
   document.getElementById("loginForm").style.display="none";
   document.getElementById("game").style.display="block";
-  coin=users[u].coin; free=users[u].free;
+  coin=users[u].coin;
+  free=users[u].free;
   updateUI();
 }
 
+// SLOT
 const symbols=["⚡","💎","🔱","🍇","🔔","💰","⭐"];
+const multipliers=[2,5,10,50,100];
 let coin=0;
 let free=0;
 
@@ -88,14 +96,22 @@ function updateUI(){
 
 function spin(){
   if(free>0){ free--; } else{ if(coin<10){alert("Coin habis"); return;} coin-=10; }
-  // spin reels
-  ["r1","r2","r3"].forEach(r=>document.getElementById(r).innerHTML=symbols[Math.floor(Math.random()*symbols.length)]);
-  if(Math.random()<0.3){ coin+=50; document.getElementById("bigwin").style.display="flex"; setTimeout(()=>{document.getElementById("bigwin").style.display="none";},1500);}
+  ["r1","r2","r3","r4","r5"].forEach(r=>{
+    document.getElementById(r).innerHTML=symbols[Math.floor(Math.random()*symbols.length)];
+  });
+  // random big win / multiplier
+  if(Math.random()<0.3){
+    let m=multipliers[Math.floor(Math.random()*multipliers.length)];
+    coin+=10*m;
+    showBigWin();
+  }
   updateUI();
 }
 
-function buyFreeSpin(){ if(coin<200){alert("Coin kurang");return;} coin-=200; free+=10; updateUI(); }
+function buyFreeSpin(){ if(coin<200){alert("Coin kurang"); return;} coin-=200; free+=10; updateUI(); alert("🎁 Dapat 10 Free Spin!"); }
 function resetCoin(){ coin=1000; free=0; updateUI(); }
+function showBigWin(){ let b=document.getElementById("bigwin"); b.style.display="flex"; setTimeout(()=>{b.style.display="none";},2000); }
+
 </script>
 </body>
 </html>
