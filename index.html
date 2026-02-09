@@ -11,6 +11,19 @@ body{
   font-family:Arial;
 }
 
+/* LOADING SCREEN */
+#loading{
+  position:fixed;
+  width:100%;height:100%;
+  background:black;
+  color:gold;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:30px;
+  z-index:9999;
+}
+
 /* TOP BAR */
 .top{
   background:#800000;
@@ -18,22 +31,18 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  font-size:14px;
   border-bottom:2px solid gold;
+  font-size:13px;
 }
-.logo{
-  font-size:18px;
-  font-weight:bold;
-  color:white;
-}
-.info span{margin:0 5px;}
+.logo{font-size:18px;font-weight:bold;}
+.info span{margin:0 6px;}
 
 /* SLOT MACHINE */
 .machine{
   display:flex;
   justify-content:center;
   align-items:center;
-  height:80vh;
+  height:75vh;
 }
 .slot-box{
   background:linear-gradient(#000,#300);
@@ -45,31 +54,29 @@ body{
 
 .reels{
   display:flex;
-  width:450px;
-  height:200px;
+  width:480px;
+  height:220px;
   overflow:hidden;
   background:black;
 }
 .reel{
-  width:150px;
+  width:160px;
   border-left:2px solid red;
+  transition:transform 0.3s;
 }
 .symbol{
-  height:65px;
+  height:70px;
   display:flex;
   align-items:center;
   justify-content:center;
 }
-.symbol img{
-  width:55px;
-  height:55px;
-}
+.symbol img{width:60px;height:60px;}
 
-/* CONTROLS */
+/* CONTROL PANEL */
 .controls{
-  text-align:center;
   background:#111;
   padding:10px;
+  text-align:center;
   border-top:2px solid gold;
 }
 button{
@@ -88,25 +95,29 @@ button:hover{background:darkred;}
   position:fixed;
   top:0;left:0;
   width:100%;height:100%;
-  background:rgba(0,0,0,0.9);
+  background:rgba(0,0,0,0.95);
   display:none;
   align-items:center;
   justify-content:center;
   flex-direction:column;
   color:gold;
-  font-size:50px;
+  font-size:60px;
   text-shadow:0 0 20px gold;
 }
 </style>
 </head>
 <body>
 
+<div id="loading">🎰 Loading Banjar Raya Cel Casino...</div>
+
 <div class="top">
   <div class="logo">BANJAR RAYA CEL 🎰</div>
   <div class="info">
-    💰 Saldo: <span id="coin">100000</span> |
-    🎯 Bet: <span id="bet">1000</span> |
-    🎁 FreeSpin: <span id="fs">0</span>
+    💰 Saldo: <span id="coin">100000</span>
+    🎯 Bet: <span id="bet">1000</span>
+    🎁 FS: <span id="fs">0</span>
+    📊 RTP: <span id="rtp">96.5%</span>
+    💎 Jackpot: <span id="jackpot">500000</span>
   </div>
 </div>
 
@@ -122,6 +133,7 @@ button:hover{background:darkred;}
 
 <div class="controls">
 <button onclick="spin()">SPIN</button>
+<button onclick="autoSpin()">AUTOSPIN</button>
 <button onclick="betPlus()">BET +</button>
 <button onclick="betMinus()">BET -</button>
 <button onclick="turbo()">TURBO</button>
@@ -133,35 +145,36 @@ button:hover{background:darkred;}
 <div id="winCount">0</div>
 </div>
 
-<!-- SOUND -->
 <audio id="spinSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_6a2b5b52c1.mp3"></audio>
 <audio id="winSound" src="https://cdn.pixabay.com/download/audio/2021/09/02/audio_2f7c84a5a4.mp3"></audio>
 
 <script>
-// simbol gambar
+// SIMBOL
 const symbols=[
 "https://img.icons8.com/color/96/cherry.png",
 "https://img.icons8.com/color/96/lemon.png",
 "https://img.icons8.com/color/96/star.png",
 "https://img.icons8.com/color/96/diamond.png",
 "https://img.icons8.com/color/96/seven.png",
-"https://img.icons8.com/color/96/gift.png" // scatter
+"https://img.icons8.com/color/96/gift.png"
 ];
 
 let coin= localStorage.getItem("coin")?parseInt(localStorage.getItem("coin")):100000;
 let bet=1000;
 let freeSpin=0;
 let turboMode=false;
+let jackpot=500000;
+let auto=false;
+
+function rand(){return symbols[Math.floor(Math.random()*symbols.length)];}
 
 function updateUI(){
-  coin=Math.floor(coin);
   document.getElementById("coin").innerHTML=coin;
   document.getElementById("bet").innerHTML=bet;
   document.getElementById("fs").innerHTML=freeSpin;
+  document.getElementById("jackpot").innerHTML=jackpot;
   localStorage.setItem("coin",coin);
 }
-
-function rand(){return symbols[Math.floor(Math.random()*symbols.length)];}
 
 function drawReel(id){
   let html="";
@@ -173,6 +186,7 @@ function drawReel(id){
 
 function spin(){
   document.getElementById("spinSound").play();
+  jackpot+=bet; // progressive jackpot
 
   if(freeSpin==0){
     if(coin<bet){alert("Saldo habis");return;}
@@ -181,60 +195,26 @@ function spin(){
 
   updateUI();
 
-  let speed= turboMode?30:120;
+  let speed= turboMode?20:120;
   let interval=setInterval(()=>{
-    drawReel("r1"); drawReel("r2"); drawReel("r3");
+    drawReel("r1");drawReel("r2");drawReel("r3");
   },speed);
 
   setTimeout(()=>{
     clearInterval(interval);
 
-    let a=rand(), b=rand(), c=rand();
+    let a=rand(),b=rand(),c=rand();
     document.getElementById("r1").innerHTML=`<div class='symbol'><img src='${a}'></div>`;
     document.getElementById("r2").innerHTML=`<div class='symbol'><img src='${b}'></div>`;
     document.getElementById("r3").innerHTML=`<div class='symbol'><img src='${c}'></div>`;
 
-    // SCATTER FREE SPIN
+    // FREE SPIN
     if(a.includes("gift")||b.includes("gift")||c.includes("gift")){
-      freeSpin+=10;
-      alert("🎁 SCATTER! +10 FREE SPIN");
+      freeSpin+=5;
+      alert("🎁 FREE SPIN +5");
     }
 
     // JACKPOT
     if(a==b && b==c){
-      let win=bet*50;
-      showBigWin(win);
-    }
-
-    updateUI();
-  },1000);
-}
-
-function showBigWin(amount){
-  document.getElementById("winSound").play();
-  let box=document.getElementById("bigwin");
-  let counter=document.getElementById("winCount");
-  box.style.display="flex";
-  let t=0;
-  let i=setInterval(()=>{
-    t+=bet*2;
-    counter.innerHTML=t;
-    if(t>=amount){
-      clearInterval(i);
-      coin+=amount;
-      updateUI();
-      setTimeout(()=>box.style.display="none",2500);
-    }
-  },50);
-}
-
-function betPlus(){bet+=1000; updateUI();}
-function betMinus(){if(bet>1000){bet-=1000; updateUI();}}
-function turbo(){turboMode=!turboMode; alert(turboMode?"⚡ TURBO ON":"TURBO OFF");}
-function resetGame(){coin=100000; bet=1000; freeSpin=0; updateUI();}
-
-updateUI();
-</script>
-
-</body>
-</html>
+      showBigWin(jackpot);
+      jackpot=500000
