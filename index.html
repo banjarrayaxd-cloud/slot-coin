@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Slot Coin Hiburan</title>
+<style>
+body {font-family: Arial; text-align:center; background:black; color:white;}
+.slot {font-size:60px; margin:20px;}
+button {padding:15px 30px; font-size:20px; background:red; color:white; border:none; border-radius:10px;}
+</style>
+</head>
+<body>
+
+<h1>🎰 SLOT COIN HIBURAN 🎰</h1>
+<h2>Coin: <span id="coin">100</span></h2>
+
+<div class="slot" id="slot">🍒 🍋 ⭐</div>
+
+<button onclick="spin()">SPIN (5 Coin)</button>
+
+<script>
+let coin = 100;
+const symbols = ["🍒","🍋","⭐","💎","7️⃣"];
+
+function spin(){
+  if(coin < 5){
+    alert("Coin habis!");
+    return;
+  }
+  coin -= 5;
+
+  let a = symbols[Math.floor(Math.random()*symbols.length)];
+  let b = symbols[Math.floor(Math.random()*symbols.length)];
+  let c = symbols[Math.floor(Math.random()*symbols.length)];
+
+  document.getElementById("slot").innerHTML = a+" "+b+" "+c;
+  document.getElementById("coin").innerHTML = coin;
+
+  if(a==b && b==c){
+    alert("JACKPOT! +50 Coin");
+    coin += 50;
+  }
+}
+</script>
+
+</body>
+</html>
