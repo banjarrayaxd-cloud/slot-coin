@@ -1,159 +1,144 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Gates of Olympus SUPER REAL</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gates of Olympus Ultra Real</title>
 <style>
-body {
-  margin:0;
-  font-family:Arial;
-  background:linear-gradient(#2b0040,#000);
-  color:white;
-  text-align:center;
+body{
+  margin:0; font-family:Arial; background:black; color:white; overflow:hidden;
 }
-h1 {color:gold;}
-.slot {
-  display:flex;
-  justify-content:center;
-  font-size:70px;
-  margin-top:20px;
+h1{color:gold;text-align:center;margin:10px 0;}
+.topbar{
+  display:flex; justify-content:space-between; padding:10px 20px; background:rgba(50,0,80,0.9);
+  font-size:14px; border-bottom:3px solid gold;
 }
-.reel {
-  width:90px;
-  height:90px;
-  border:2px solid gold;
-  margin:5px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:black;
-  border-radius:10px;
+.topbar div{display:flex;gap:10px;align-items:center;}
+#machine{display:flex;justify-content:center;margin-top:20px;}
+.reel{
+  width:72px;height:216px; margin:0 3px; overflow:hidden; background:rgba(0,0,0,0.6); border:2px solid gold; border-radius:10px;
+  display:flex; flex-direction:column;
 }
-button {
-  padding:12px 25px;
-  font-size:16px;
-  background:gold;
-  border:none;
-  border-radius:8px;
-  margin:5px;
+.symbol{height:72px; display:flex; justify-content:center; align-items:center; font-size:50px;}
+.controls{text-align:center;margin-top:15px;}
+button{padding:10px 20px;margin:5px;border:none;border-radius:8px;background:gold;font-size:14px;}
+button:hover{background:orange;}
+.bigwin{
+  position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);
+  display:flex;justify-content:center;align-items:center;font-size:50px;color:gold;display:none;
+  text-shadow:0 0 20px gold; z-index:99;
 }
-button:hover {background:orange;}
-.win {
-  box-shadow:0 0 30px gold;
+.zeus{position:fixed;bottom:0;right:0;font-size:100px;opacity:0.3;}
+.multi{
+  position:fixed;top:-50px;font-size:40px;color:gold;text-shadow:0 0 15px gold;
+  animation:drop 2s linear forwards;
 }
-.bigwin {
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:rgba(0,0,0,0.9);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  font-size:50px;
-  color:gold;
-  z-index:99;
-}
+@keyframes drop{to{top:100%;}}
 </style>
 </head>
 <body>
-
-<h1>⚡ GATES OF OLYMPUS DEMO ⚡</h1>
-<h2>💰 Coin: <span id="coin">1000</span></h2>
-<h3>🔥 Free Spins: <span id="free">0</span></h3>
-
-<div class="slot" id="machine">
-  <div class="reel" id="r1">🍒</div>
-  <div class="reel" id="r2">🍋</div>
-  <div class="reel" id="r3">⭐</div>
+<h1>⚡ Gates of Olympus Ultra Real ⚡</h1>
+<div class="topbar">
+  <div>💰 Coin: <span id="coin">100000</span> | Bet: <span id="bet">1000</span></div>
+  <div>🎯 Free Spin: <span id="free">0</span></div>
 </div>
 
-<button onclick="spin()">SPIN (10)</button>
-<button onclick="buyFreeSpin()">BUY FREE SPIN (200)</button>
-<button onclick="resetCoin()">RESET</button>
+<div id="machine">
+  <div class="reel" id="r1"></div>
+  <div class="reel" id="r2"></div>
+  <div class="reel" id="r3"></div>
+  <div class="reel" id="r4"></div>
+  <div class="reel" id="r5"></div>
+</div>
 
-<div class="bigwin" id="bigwin">💰 BIG WIN!!!</div>
+<div class="controls">
+<button onclick="spin()">SPIN</button>
+<button onclick="autoSpin()">AUTO</button>
+<button onclick="buyFreeSpin()">BUY FREE SPIN</button>
+<button onclick="resetGame()">RESET</button>
+</div>
 
-<!-- SOUND -->
+<div class="bigwin" id="bigwin">🎉 BIG WIN 🎉</div>
+<div class="zeus">⚡</div>
+
+<!-- SOUNDS -->
 <audio id="spinSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_3e8b7c8c3c.mp3"></audio>
-<audio id="winSound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_6d9e0e0b6c.mp3"></audio>
+<audio id="winSound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_6d9e0e0b6.mp3"></audio>
+<audio id="bgMusic" src="https://cdn.pixabay.com/audio/2022/03/10/audio_3d5f7e0b.mp3" autoplay loop></audio>
 
 <script>
-const symbols=["🍒","🍋","⭐","💎","7️⃣","⚡"];
-let coin = localStorage.coin?parseInt(localStorage.coin):1000;
-let free = localStorage.free?parseInt(localStorage.free):0;
+const symbols=["⚡","💎","🔱","🍇","🔔","💰","⭐"];
+const multipliers=[2,5,10,50,100];
 
-update();
+let coin=100000;
+let bet=1000;
+let free=0;
+let auto=false;
 
-function update(){
- document.getElementById("coin").innerHTML=coin;
- document.getElementById("free").innerHTML=free;
- localStorage.coin=coin;
- localStorage.free=free;
+function updateUI(){
+  document.getElementById("coin").innerHTML=coin;
+  document.getElementById("bet").innerHTML=bet;
+  document.getElementById("free").innerHTML=free;
+}
+
+function buildReel(id){
+  let html="";
+  for(let i=0;i<12;i++){
+    html+=`<div class="symbol">${symbols[Math.floor(Math.random()*symbols.length)]}</div>`;
+  }
+  document.getElementById(id).innerHTML=html;
+}
+
+function drawAll(){
+  for(let i=1;i<=5;i++) buildReel("r"+i);
 }
 
 function spin(){
- if(free>0){
-   free--;
- } else {
-   if(coin<10){alert("Coin habis");return;}
-   coin-=10;
- }
+  document.getElementById("spinSound").play();
+  if(free>0){ free--; } else{ if(coin<bet){alert("Coin habis"); return;} coin-=bet; }
 
- document.getElementById("spinSound").play();
+  drawAll();
+  updateUI();
 
- let reels=["r1","r2","r3"];
- let interval=setInterval(()=>{
-  reels.forEach(r=>{
-    document.getElementById(r).innerHTML=symbols[Math.floor(Math.random()*symbols.length)];
-  });
- },100);
-
- setTimeout(()=>{
-  clearInterval(interval);
-
-  let a=symbols[Math.floor(Math.random()*symbols.length)];
-  let b=symbols[Math.floor(Math.random()*symbols.length)];
-  let c=symbols[Math.floor(Math.random()*symbols.length)];
-
-  r1.innerHTML=a; r2.innerHTML=b; r3.innerHTML=c;
-
-  let mult=[2,5,10,50,100];
-  if(a=="⚡"||b=="⚡"||c=="⚡"){
-    let m=mult[Math.floor(Math.random()*mult.length)];
-    coin+=m*10;
-    alert("⚡ MULTIPLIER x"+m);
+  if(Math.random()<0.1){ free+=10; alert("🎁 FREE SPIN +10"); }
+  if(Math.random()<0.3){
+    let m=multipliers[Math.floor(Math.random()*multipliers.length)];
+    dropMultiplier(m);
+    let win=bet*m;
+    showBigWin(win);
   }
+}
 
-  if(a==b&&b==c){
-    coin+=500;
-    showBigWin();
-  }
+function dropMultiplier(m){
+  let d=document.createElement("div");
+  d.className="multi";
+  d.innerHTML="x"+m;
+  d.style.left=Math.random()*80+"%";
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(),2000);
+}
 
-  update();
- },1200);
+function showBigWin(amount=0){
+  let b=document.getElementById("bigwin");
+  b.style.display="flex";
+  document.getElementById("winSound").play();
+  if(amount>0){ coin+=amount; updateUI();}
+  setTimeout(()=>b.style.display="none",2000);
 }
 
 function buyFreeSpin(){
- if(coin<200){alert("Coin kurang");return;}
- coin-=200;
- free+=10;
- alert("🎁 Dapat 10 Free Spin!");
- update();
+  if(coin<200){alert("Coin kurang"); return;}
+  coin-=200;
+  free+=10;
+  alert("🎁 Dapat 10 Free Spin!");
+  updateUI();
 }
 
-function resetCoin(){
- coin=1000;
- free=0;
- update();
-}
+function resetGame(){ coin=100000; bet=1000; free=0; updateUI(); }
+function autoSpin(){ auto=!auto; alert(auto?"AUTO ON":"AUTO OFF"); if(auto){let loop=setInterval(()=>{ if(!auto) clearInterval(loop); spin(); },1500);} }
 
-function showBigWin(){
- let b=document.getElementById("bigwin");
- b.style.display="flex";
- document.getElementById("winSound").play();
- setTimeout(()=>{b.style.display="none";},2000);
-}
+drawAll();
+updateUI();
 </script>
-
 </body>
 </html>
