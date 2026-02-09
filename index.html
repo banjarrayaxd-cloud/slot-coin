@@ -1,20 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Olympus Pro Max - Banjar Raya Cel</title>
+<title>Olympus Super Casino - Banjar Raya Cel</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{
   margin:0;
-  background:linear-gradient(#2b004d,#000);
-  color:white;
   font-family:Arial;
+  color:white;
   text-align:center;
+  overflow:hidden;
+}
+
+/* BACKGROUND CLOUDS */
+.bg{
+  position:fixed;
+  width:200%;
+  height:100%;
+  background:url("https://i.imgur.com/8KQ6gK7.png");
+  background-size:cover;
+  animation:movebg 60s linear infinite;
+  z-index:-2;
+}
+@keyframes movebg{
+  from{transform:translateX(0);}
+  to{transform:translateX(-50%);}
+}
+
+/* LIGHTNING */
+.lightning{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:white;
+  opacity:0;
+  animation:flash 8s infinite;
+  z-index:-1;
+}
+@keyframes flash{
+  0%,95%,100%{opacity:0;}
+  96%{opacity:0.8;}
+  97%{opacity:0;}
+  98%{opacity:0.6;}
+  99%{opacity:0;}
 }
 
 /* HEADER */
 .top{
-  background:#4b0066;
+  background:rgba(50,0,80,0.8);
   padding:10px;
   border-bottom:3px solid gold;
   display:flex;
@@ -23,21 +56,13 @@ body{
 }
 .logo{color:gold;font-size:20px;font-weight:bold;}
 
-/* ZEUS */
-.zeus{
-  font-size:22px;
-  color:gold;
-  text-shadow:0 0 10px gold;
-  margin:5px;
-}
-
-/* SLOT GRID */
+/* SLOT BOX */
 .slot-box{
   width:360px;
   margin:auto;
   border:4px solid gold;
   border-radius:15px;
-  background:black;
+  background:rgba(0,0,0,0.7);
   padding:10px;
   box-shadow:0 0 20px gold;
 }
@@ -54,21 +79,7 @@ body{
   padding:10px;
 }
 
-/* MULTIPLIER DROP */
-.multi{
-  position:fixed;
-  top:0;
-  font-size:30px;
-  color:gold;
-  text-shadow:0 0 10px gold;
-  animation:drop 2s linear forwards;
-}
-@keyframes drop{
-  from{top:-50px;}
-  to{top:100%;}
-}
-
-/* CONTROL */
+/* CONTROLS */
 .controls{margin-top:10px;}
 button{
   padding:10px 18px;
@@ -94,12 +105,39 @@ button:hover{background:orange;}
   color:gold;
   text-shadow:0 0 20px gold;
 }
+
+/* MULTIPLIER DROP */
+.multi{
+  position:fixed;
+  top:-50px;
+  font-size:40px;
+  color:gold;
+  text-shadow:0 0 15px gold;
+  animation:drop 2s linear forwards;
+}
+@keyframes drop{
+  to{top:100%;}
+}
+
+/* ONLINE COUNTER */
+.online{
+  position:fixed;
+  bottom:5px;
+  right:5px;
+  background:black;
+  padding:5px 10px;
+  border:1px solid gold;
+  font-size:12px;
+}
 </style>
 </head>
 <body>
 
+<div class="bg"></div>
+<div class="lightning"></div>
+
 <div class="top">
-<div class="logo">⚡ OLYMPUS PRO MAX</div>
+<div class="logo">⚡ OLYMPUS SUPER CASINO</div>
 <div>
 💰 Saldo: <span id="coin">100000</span> |
 🎯 Bet: <span id="bet">1000</span> |
@@ -107,7 +145,7 @@ button:hover{background:orange;}
 </div>
 </div>
 
-<div class="zeus">⚡ ZEUS POWER ACTIVE ⚡</div>
+<h3 style="color:gold;text-shadow:0 0 10px gold;">⚡ ZEUS POWER ACTIVE ⚡</h3>
 
 <div class="slot-box">
 <div class="grid" id="grid"></div>
@@ -126,8 +164,13 @@ button:hover{background:orange;}
 <div id="winCount">0</div>
 </div>
 
+<div class="online">👥 Online: <span id="online">12345</span></div>
+
+<!-- SOUND -->
+<audio id="spinSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_6a2b5b52c1.mp3"></audio>
+<audio id="winSound" src="https://cdn.pixabay.com/download/audio/2021/09/02/audio_2f7c84a5a4.mp3"></audio>
+
 <script>
-// SIMBOL
 const symbols=["⚡","💎","🔱","🍇","🔔","💰","⭐"];
 const multipliers=[2,5,10,50,100];
 
@@ -154,6 +197,8 @@ function drawGrid(){
 }
 
 function spin(){
+  document.getElementById("spinSound").play();
+
   if(freeSpin==0){
     if(coin<bet){alert("Saldo habis");return;}
     coin-=bet;
@@ -163,12 +208,12 @@ function spin(){
   updateUI();
 
   // scatter free spin
-  if(Math.random()<0.08){
+  if(Math.random()<0.1){
     freeSpin+=10;
     alert("🎁 FREE SPIN +10");
   }
 
-  // multiplier drop
+  // multiplier
   if(Math.random()<0.3){
     let m=multipliers[Math.floor(Math.random()*multipliers.length)];
     dropMultiplier(m);
@@ -187,6 +232,7 @@ function dropMultiplier(m){
 }
 
 function showBigWin(amount){
+  document.getElementById("winSound").play();
   let box=document.getElementById("bigwin");
   let counter=document.getElementById("winCount");
   box.style.display="flex";
@@ -204,8 +250,7 @@ function showBigWin(amount){
 }
 
 function betPlus(){bet+=1000;updateUI();}
-function betMinus(){if(bet>1000){bet-=1000;updateUI();}
-}
+function betMinus(){if(bet>1000){bet-=1000;updateUI();}}
 function resetGame(){coin=100000;bet=1000;freeSpin=0;updateUI();}
 
 function autoSpin(){
@@ -218,6 +263,12 @@ function autoSpin(){
     },1200);
   }
 }
+
+// Fake online players
+setInterval(()=>{
+  document.getElementById("online").innerHTML=
+    Math.floor(10000+Math.random()*5000);
+},2000);
 
 drawGrid();
 updateUI();
