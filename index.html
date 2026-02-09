@@ -3,21 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gates of Olympus Ultra Real Login</title>
+<title>Gates of Olympus Zeus Ultra Real</title>
 <style>
-body{margin:0;font-family:Arial;background:black;color:white;text-align:center;}
-h1{color:gold;}
+body{margin:0;font-family:Arial;background:linear-gradient(#000,#15002b);color:white;text-align:center;overflow:hidden;}
+h1{color:gold;margin:10px 0;text-shadow:0 0 10px #fff;}
 input,button{padding:10px;margin:5px;font-size:16px;border-radius:8px;}
-button{background:gold;border:none;}
+button{background:gold;border:none;cursor:pointer;}
 button:hover{background:orange;}
 #game{display:none;}
 .reel{width:72px;height:72px;margin:5px;display:inline-flex;justify-content:center;align-items:center;font-size:50px;background:rgba(0,0,0,0.6);border:2px solid gold;border-radius:10px;}
-.bigwin{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;justify-content:center;align-items:center;font-size:50px;color:gold;display:none;z-index:99;}
+.bigwin{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;justify-content:center;align-items:center;font-size:50px;color:gold;display:none;z-index:99;text-shadow:0 0 20px gold;}
+.zeus{position:fixed;top:10px;right:10px;font-size:100px;color:rgba(255,255,255,0.2);}
 </style>
 </head>
 <body>
 
-<h1>⚡ Gates of Olympus Ultra Real ⚡</h1>
+<h1>⚡ Gates of Olympus ZEUS ULTRA REAL ⚡</h1>
 
 <div id="loginForm">
   <input type="text" id="username" placeholder="Username"><br>
@@ -45,12 +46,16 @@ button:hover{background:orange;}
 </div>
 
 <div class="bigwin" id="bigwin">🎉 BIG WIN 🎉</div>
+<div class="zeus">⚡</div>
+
+<!-- SOUNDS -->
+<audio id="spinSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_3e8b7c8c3c.mp3"></audio>
+<audio id="winSound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_6d9e0e0b.mp3"></audio>
+<audio id="bgMusic" src="https://cdn.pixabay.com/audio/2022/03/10/audio_3d5f7e0b.mp3" autoplay loop></audio>
 </div>
 
 <script>
 let currentUser="";
-
-// Simpan semua user: localStorage["users"] = JSON.stringify({username:{password, coin, free}})
 if(!localStorage.users) localStorage.users=JSON.stringify({});
 
 function register(){
@@ -99,7 +104,7 @@ function spin(){
   ["r1","r2","r3","r4","r5"].forEach(r=>{
     document.getElementById(r).innerHTML=symbols[Math.floor(Math.random()*symbols.length)];
   });
-  // random big win / multiplier
+  document.getElementById("spinSound").play();
   if(Math.random()<0.3){
     let m=multipliers[Math.floor(Math.random()*multipliers.length)];
     coin+=10*m;
@@ -110,7 +115,7 @@ function spin(){
 
 function buyFreeSpin(){ if(coin<200){alert("Coin kurang"); return;} coin-=200; free+=10; updateUI(); alert("🎁 Dapat 10 Free Spin!"); }
 function resetCoin(){ coin=1000; free=0; updateUI(); }
-function showBigWin(){ let b=document.getElementById("bigwin"); b.style.display="flex"; setTimeout(()=>{b.style.display="none";},2000); }
+function showBigWin(){ let b=document.getElementById("bigwin"); b.style.display="flex"; document.getElementById("winSound").play(); setTimeout(()=>{b.style.display="none";},2000); }
 
 </script>
 </body>
