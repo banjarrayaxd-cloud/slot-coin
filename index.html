@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Olympus Ultra Slot</title>
+<title>Olympus DEV Engine</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{
@@ -12,18 +12,47 @@ body{
   overflow:hidden;
 }
 
-/* BACKGROUND VIDEO */
-video{
+/* FULLSCREEN BUTTON */
+.fullbtn{
   position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  object-fit:cover;
+  top:5px;
+  right:5px;
+  z-index:99;
+  padding:6px 10px;
+  background:gold;
+  border:none;
+  border-radius:6px;
+}
+
+/* BACKGROUND */
+.bg{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:linear-gradient(#3a0066,#000);
   z-index:-2;
 }
 
-/* TOP BAR */
+/* LIGHTNING FLASH */
+.lightning{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:white;
+  opacity:0;
+  animation:flash 6s infinite;
+  z-index:-1;
+}
+@keyframes flash{
+  0%,96%,100%{opacity:0;}
+  97%{opacity:0.8;}
+  98%{opacity:0;}
+  99%{opacity:0.6;}
+}
+
+/* HEADER */
 .top{
-  background:rgba(50,0,80,0.7);
+  background:rgba(50,0,80,0.8);
   padding:10px;
   border-bottom:2px solid gold;
   display:flex;
@@ -32,26 +61,32 @@ video{
 }
 .logo{color:gold;font-size:20px;font-weight:bold;}
 
-/* SLOT */
+/* SLOT MACHINE */
 .machine{
   display:flex;
   justify-content:center;
   align-items:center;
-  height:70vh;
+  height:65vh;
 }
 .reels{
   display:flex;
-  width:300px;
+  width:360px;
   height:240px;
-  background:black;
   border:4px solid gold;
   border-radius:10px;
+  background:black;
   overflow:hidden;
 }
 .reel{
-  width:100px;
+  width:120px;
   border-left:2px solid purple;
   position:relative;
+  overflow:hidden;
+}
+.reelInner{
+  position:absolute;
+  top:0;
+  width:100%;
 }
 .symbol{
   font-size:40px;
@@ -63,27 +98,26 @@ video{
 
 /* CONTROLS */
 .controls{
+  background:#111;
   text-align:center;
   padding:10px;
-  background:#111;
 }
 button{
   padding:10px 20px;
-  font-size:14px;
   background:gold;
   border:none;
   border-radius:8px;
   margin:5px;
+  font-size:14px;
 }
-button:hover{background:orange;}
 
 /* ZEUS */
 .zeus{
   position:fixed;
   bottom:0;
   right:0;
-  font-size:80px;
-  opacity:0.3;
+  font-size:120px;
+  opacity:0.2;
 }
 
 /* BIG WIN */
@@ -99,29 +133,40 @@ button:hover{background:orange;}
   font-size:50px;
   color:gold;
 }
+
+/* LEADERBOARD */
+.leader{
+  position:fixed;
+  left:0;
+  top:50%;
+  background:black;
+  padding:8px;
+  border:1px solid gold;
+  font-size:12px;
+}
 </style>
 </head>
 <body>
 
-<!-- BACKGROUND VIDEO -->
-<video autoplay muted loop>
-<source src="https://cdn.coverr.co/videos/coverr-clouds-over-mountains-1712/1080p.mp4" type="video/mp4">
-</video>
+<div class="bg"></div>
+<div class="lightning"></div>
+
+<button class="fullbtn" onclick="goFull()">FULLSCREEN</button>
 
 <div class="top">
-<div class="logo">⚡ OLYMPUS ULTRA SLOT</div>
+<div class="logo">⚡ OLYMPUS DEV ENGINE</div>
 <div>
 💰 <span id="coin">100000</span> |
 🎯 Bet: <span id="bet">1000</span> |
-📊 RTP: 96.5%
+FPS: <span id="fps">60</span>
 </div>
 </div>
 
 <div class="machine">
 <div class="reels">
-  <div class="reel" id="r1"></div>
-  <div class="reel" id="r2"></div>
-  <div class="reel" id="r3"></div>
+  <div class="reel"><div class="reelInner" id="r1"></div></div>
+  <div class="reel"><div class="reelInner" id="r2"></div></div>
+  <div class="reel"><div class="reelInner" id="r3"></div></div>
 </div>
 </div>
 
@@ -138,24 +183,31 @@ button:hover{background:orange;}
 <div id="winCount">0</div>
 </div>
 
+<div class="leader" id="leader">
+🏆 TOP WIN<br>
+1. Player88 : 1,250,000<br>
+2. ZeusKing : 820,000<br>
+3. SlotPro : 500,000
+</div>
+
 <div class="zeus">⚡</div>
 
 <script>
 const symbols=["⚡","💎","🔱","🍇","🔔","💰","⭐"];
-
 let coin=100000;
 let bet=1000;
 let auto=false;
 
 function rand(){return symbols[Math.floor(Math.random()*symbols.length)];}
 
-function drawReel(id){
+function buildReel(id){
   let html="";
-  for(let i=0;i<3;i++){
+  for(let i=0;i<20;i++){
     html+=`<div class="symbol">${rand()}</div>`;
   }
   document.getElementById(id).innerHTML=html;
 }
+buildReel("r1");buildReel("r2");buildReel("r3");
 
 function updateUI(){
   document.getElementById("coin").innerHTML=coin;
@@ -167,23 +219,28 @@ function spin(){
   coin-=bet;
   updateUI();
 
-  let speed=50;
-  let interval=setInterval(()=>{
-    drawReel("r1"); drawReel("r2"); drawReel("r3");
-  },speed);
+  animateReel("r1");
+  animateReel("r2");
+  animateReel("r3");
 
   setTimeout(()=>{
-    clearInterval(interval);
-
     let a=rand(),b=rand(),c=rand();
-    document.getElementById("r1").innerHTML=`<div class="symbol">${a}</div>`;
-    document.getElementById("r2").innerHTML=`<div class="symbol">${b}</div>`;
-    document.getElementById("r3").innerHTML=`<div class="symbol">${c}</div>`;
-
     if(a==b && b==c){
       showBigWin(bet*50);
     }
-  },1200);
+  },1500);
+}
+
+function animateReel(id){
+  let reel=document.getElementById(id);
+  let pos=0;
+  let speed=20;
+  let anim=setInterval(()=>{
+    pos-=speed;
+    reel.style.top=pos+"px";
+    if(pos<-800){pos=0;}
+  },16);
+  setTimeout(()=>clearInterval(anim),1200);
 }
 
 function showBigWin(amount){
@@ -204,7 +261,8 @@ function showBigWin(amount){
 }
 
 function betPlus(){bet+=1000;updateUI();}
-function betMinus(){if(bet>1000){bet-=1000;updateUI();}}
+function betMinus(){if(bet>1000){bet-=1000;updateUI();}
+}
 function resetGame(){coin=100000;bet=1000;updateUI();}
 
 function autoSpin(){
@@ -213,11 +271,27 @@ function autoSpin(){
     let loop=setInterval(()=>{
       if(!auto){clearInterval(loop);}
       spin();
-    },1500);
+    },1800);
   }
 }
 
-drawReel("r1");drawReel("r2");drawReel("r3");
+function goFull(){
+  document.documentElement.requestFullscreen();
+}
+
+// FPS MONITOR
+let last=performance.now(), frames=0;
+function fpsLoop(){
+  frames++;
+  let now=performance.now();
+  if(now-last>=1000){
+    document.getElementById("fps").innerHTML=frames;
+    frames=0; last=now;
+  }
+  requestAnimationFrame(fpsLoop);
+}
+fpsLoop();
+
 updateUI();
 </script>
 
