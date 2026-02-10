@@ -1,122 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pragmatic Zeus Demo</title>
+<title>PG Slot Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{margin:0;font-family:Arial;background:linear-gradient(#000,#15002b);color:white;text-align:center;overflow:hidden;}
-h1{color:gold;margin:10px 0;text-shadow:0 0 10px #fff;}
-input,button{padding:10px;margin:5px;font-size:16px;border-radius:8px;}
-button{background:gold;border:none;cursor:pointer;}
-button:hover{background:orange;}
-#game{display:none;}
-.reel{width:72px;height:72px;margin:5px;display:inline-flex;justify-content:center;align-items:center;font-size:50px;background:rgba(0,0,0,0.6);border:2px solid gold;border-radius:10px;}
-.bigwin{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;justify-content:center;align-items:center;font-size:50px;color:gold;display:none;z-index:99;text-shadow:0 0 20px gold;}
-.zeus{position:fixed;top:10px;right:10px;font-size:100px;color:rgba(255,255,255,0.2);}
+body {font-family:Arial;background:#111;color:#fff;text-align:center;padding:20px;}
+#game {display:none;}
+input,button {padding:10px;font-size:16px;margin:5px;border-radius:5px;border:none;}
+button {background:red;color:white;font-weight:bold;}
+.slot-box {font-size:40px;background:black;padding:15px;margin:10px;border:2px solid gold;display:inline-block;}
 </style>
 </head>
+
 <body>
 
-<h1>⚡ Pragmatic Zeus Slot Demo ⚡</h1>
+<h2>🎰 PG SLOT DEMO</h2>
 
-<div id="loginForm">
-  <input type="text" id="username" placeholder="Username"><br>
-  <input type="password" id="password" placeholder="Password"><br>
-  <button onclick="register()">Daftar</button>
-  <button onclick="login()">Login</button>
+<!-- FORM DAFTAR -->
+<div id="form">
+<h3>Daftar dulu untuk masuk demo</h3>
+<input type="text" id="nama" placeholder="Nama"><br>
+<input type="tel" id="hp" placeholder="No HP"><br>
+<button onclick="masuk()">MASUK DEMO</button>
 </div>
 
+<!-- GAME SLOT -->
 <div id="game">
-<h2>💰 Coin: <span id="coin">1000</span></h2>
-<h3>🔥 Free Spins: <span id="free">0</span></h3>
+<h3>Saldo Demo: <span id="saldo">1000</span> Koin</h3>
 
-<div id="machine">
-  <div class="reel" id="r1">🍒</div>
-  <div class="reel" id="r2">🍋</div>
-  <div class="reel" id="r3">⭐</div>
-  <div class="reel" id="r4">💎</div>
-  <div class="reel" id="r5">⚡</div>
-</div>
+<div class="slot-box" id="s1">🍒</div>
+<div class="slot-box" id="s2">🍋</div>
+<div class="slot-box" id="s3">🔔</div><br>
 
-<div class="controls">
 <button onclick="spin()">SPIN</button>
-<button onclick="buyFreeSpin()">BUY FREE SPIN</button>
-<button onclick="resetCoin()">RESET</button>
-</div>
-
-<div class="bigwin" id="bigwin">🎉 BIG WIN 🎉</div>
-<div class="zeus">⚡</div>
-
-<!-- SOUNDS -->
-<audio id="spinSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_3e8b7c8c3c.mp3"></audio>
-<audio id="winSound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_6d9e0e0b.mp3"></audio>
-<audio id="bgMusic" src="https://cdn.pixabay.com/audio/2022/03/10/audio_3d5f7e0b.mp3" autoplay loop></audio>
 </div>
 
 <script>
-let currentUser="";
-if(!localStorage.users) localStorage.users=JSON.stringify({});
-
-function register(){
-  let u=document.getElementById("username").value.trim();
-  let p=document.getElementById("password").value.trim();
-  if(!u||!p){alert("Isi username & password"); return;}
-  let users=JSON.parse(localStorage.users);
-  if(users[u]){alert("Username sudah ada"); return;}
-  users[u]={password:p,coin:1000,free:0};
-  localStorage.users=JSON.stringify(users);
-  alert("Daftar berhasil! Silahkan login");
-}
-
-function login(){
-  let u=document.getElementById("username").value.trim();
-  let p=document.getElementById("password").value.trim();
-  let users=JSON.parse(localStorage.users);
-  if(!users[u]||users[u].password!==p){alert("Login gagal"); return;}
-  currentUser=u;
-  document.getElementById("loginForm").style.display="none";
+function masuk(){
+  let nama=document.getElementById("nama").value;
+  let hp=document.getElementById("hp").value;
+  if(nama=="" || hp==""){alert("Isi nama dan no HP dulu");return;}
+  
+  alert("Selamat datang "+nama+"!");
+  document.getElementById("form").style.display="none";
   document.getElementById("game").style.display="block";
-  coin=users[u].coin;
-  free=users[u].free;
-  updateUI();
 }
 
-// SLOT
-const symbols=["⚡","💎","🔱","🍇","🔔","💰","⭐"];
-const multipliers=[2,5,10,50,100];
-let coin=0;
-let free=0;
-
-function updateUI(){
-  document.getElementById("coin").innerHTML=coin;
-  document.getElementById("free").innerHTML=free;
-  if(currentUser){
-    let users=JSON.parse(localStorage.users);
-    users[currentUser].coin=coin;
-    users[currentUser].free=free;
-    localStorage.users=JSON.stringify(users);
-  }
-}
-
+// SLOT ENGINE
+let simbol=["🍒","🍋","🔔","💎","🍉"];
 function spin(){
-  if(free>0){ free--; } else{ if(coin<10){alert("Coin habis"); return;} coin-=10; }
-  ["r1","r2","r3","r4","r5"].forEach(r=>{
-    document.getElementById(r).innerHTML=symbols[Math.floor(Math.random()*symbols.length)];
-  });
-  document.getElementById("spinSound").play();
-  if(Math.random()<0.3){
-    let m=multipliers[Math.floor(Math.random()*multipliers.length)];
-    coin+=10*m;
-    showBigWin();
-  }
-  updateUI();
+ let s1=simbol[Math.floor(Math.random()*simbol.length)];
+ let s2=simbol[Math.floor(Math.random()*simbol.length)];
+ let s3=simbol[Math.floor(Math.random()*simbol.length)];
+ document.getElementById("s1").innerHTML=s1;
+ document.getElementById("s2").innerHTML=s2;
+ document.getElementById("s3").innerHTML=s3;
+
+ let saldo=parseInt(document.getElementById("saldo").innerHTML);
+ saldo-=10;
+ if(s1==s2 && s2==s3){
+   alert("WIN!!!");
+   saldo+=100;
+ }
+ document.getElementById("saldo").innerHTML=saldo;
 }
-
-function buyFreeSpin(){ if(coin<200){alert("Coin kurang"); return;} coin-=200; free+=10; updateUI(); alert("🎁 Dapat 10 Free Spin!"); }
-function resetCoin(){ coin=1000; free=0; updateUI(); }
-function showBigWin(){ let b=document.getElementById("bigwin"); b.style.display="flex"; document.getElementById("winSound").play(); setTimeout(()=>{b.style.display="none";},2000); }
-
 </script>
+
 </body>
 </html>
