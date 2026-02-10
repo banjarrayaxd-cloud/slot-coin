@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>PG Slot Demo</title>
+<title>Banjar Raya Slot Demo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body {font-family:Arial;background:#111;color:#fff;text-align:center;padding:20px;}
+body {font-family:Arial;background:#000;color:#fff;text-align:center;padding:20px;}
 #game {display:none;}
 input,button {padding:10px;font-size:16px;margin:5px;border-radius:5px;border:none;}
 button {background:red;color:white;font-weight:bold;}
-.slot-box {font-size:40px;background:black;padding:15px;margin:10px;border:2px solid gold;display:inline-block;}
+.slot-box {font-size:50px;background:black;padding:20px;margin:10px;border:3px solid gold;display:inline-block;border-radius:10px;}
+.captcha {font-size:22px;background:#222;padding:10px;display:inline-block;letter-spacing:3px;font-weight:bold;}
 </style>
 </head>
 
 <body>
 
-<h2>🎰 PG SLOT DEMO</h2>
+<h2>🔥 BANJAR RAYA SLOT DEMO 🔥</h2>
 
 <!-- FORM DAFTAR -->
 <div id="form">
-<h3>Daftar dulu untuk masuk demo</h3>
-<input type="text" id="nama" placeholder="Nama"><br>
+<h3>DAFTAR AKUN</h3>
+<input type="text" id="user" placeholder="Username"><br>
+<input type="password" id="pass" placeholder="Password"><br>
 <input type="tel" id="hp" placeholder="No HP"><br>
-<button onclick="masuk()">MASUK DEMO</button>
+
+<div class="captcha" id="captcha"></div><br>
+<input type="text" id="capInput" placeholder="Masukkan kode captcha"><br>
+
+<button onclick="daftar()">DAFTAR & MASUK</button>
 </div>
 
 <!-- GAME SLOT -->
@@ -32,22 +38,35 @@ button {background:red;color:white;font-weight:bold;}
 <div class="slot-box" id="s2">🍋</div>
 <div class="slot-box" id="s3">🔔</div><br>
 
-<button onclick="spin()">SPIN</button>
+<button onclick="spin()">🎰 SPIN</button>
 </div>
 
 <script>
-function masuk(){
-  let nama=document.getElementById("nama").value;
-  let hp=document.getElementById("hp").value;
-  if(nama=="" || hp==""){alert("Isi nama dan no HP dulu");return;}
-  
-  alert("Selamat datang "+nama+"!");
+// CAPTCHA
+let kode="";
+function buatCaptcha(){
+  kode = Math.random().toString(36).substring(2,7);
+  document.getElementById("captcha").innerHTML=kode;
+}
+buatCaptcha();
+
+// FORM DAFTAR
+function daftar(){
+  let u=document.getElementById("user").value;
+  let p=document.getElementById("pass").value;
+  let h=document.getElementById("hp").value;
+  let c=document.getElementById("capInput").value;
+
+  if(u==""||p==""||h==""){alert("Isi semua data!");return;}
+  if(c!=kode){alert("Captcha salah!");buatCaptcha();return;}
+
+  alert("Akun berhasil dibuat: "+u);
   document.getElementById("form").style.display="none";
   document.getElementById("game").style.display="block";
 }
 
 // SLOT ENGINE
-let simbol=["🍒","🍋","🔔","💎","🍉"];
+let simbol=["🍒","🍋","🔔","💎","🍉","7️⃣"];
 function spin(){
  let s1=simbol[Math.floor(Math.random()*simbol.length)];
  let s2=simbol[Math.floor(Math.random()*simbol.length)];
@@ -58,10 +77,14 @@ function spin(){
 
  let saldo=parseInt(document.getElementById("saldo").innerHTML);
  saldo-=10;
+
  if(s1==s2 && s2==s3){
-   alert("WIN!!!");
-   saldo+=100;
+   alert("🔥 JACKPOT BANJAR RAYA 🔥");
+   saldo+=500;
  }
+
+ if(saldo<=0){saldo=1000;}
+
  document.getElementById("saldo").innerHTML=saldo;
 }
 </script>
