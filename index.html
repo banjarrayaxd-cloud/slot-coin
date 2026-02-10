@@ -1,92 +1,162 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Banjar Raya Slot Demo</title>
+<title>Banjar Raya PG Demo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body {font-family:Arial;background:#000;color:#fff;text-align:center;padding:20px;}
-#game {display:none;}
-input,button {padding:10px;font-size:16px;margin:5px;border-radius:5px;border:none;}
-button {background:red;color:white;font-weight:bold;}
-.slot-box {font-size:50px;background:black;padding:20px;margin:10px;border:3px solid gold;display:inline-block;border-radius:10px;}
-.captcha {font-size:22px;background:#222;padding:10px;display:inline-block;letter-spacing:3px;font-weight:bold;}
+body{
+  font-family:Arial;
+  background:radial-gradient(circle,#000,#200);
+  color:white;
+  text-align:center;
+  padding:10px;
+}
+
+h2{color:gold;text-shadow:0 0 10px red;}
+
+#game{display:none;}
+
+input,button{
+  padding:10px;
+  font-size:16px;
+  margin:5px;
+  border-radius:5px;
+  border:none;
+}
+
+button{
+  background:red;
+  color:white;
+  font-weight:bold;
+  box-shadow:0 0 5px gold;
+}
+
+.reel{
+  width:80px;
+  height:80px;
+  background:black;
+  border:3px solid gold;
+  border-radius:10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:50px;
+  margin:5px;
+}
+
+.captcha{
+  background:#222;
+  padding:8px;
+  font-size:20px;
+  letter-spacing:4px;
+  display:inline-block;
+}
+
+#popup{
+  position:fixed;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+  background:black;
+  border:2px solid gold;
+  padding:8px;
+  display:none;
+}
 </style>
 </head>
 
 <body>
 
-<h2>🔥 BANJAR RAYA SLOT DEMO 🔥</h2>
+<h2>🎰 BANJAR RAYA PG SLOT DEMO 🎰</h2>
 
 <!-- FORM DAFTAR -->
 <div id="form">
 <h3>DAFTAR AKUN</h3>
-<input type="text" id="user" placeholder="Username"><br>
-<input type="password" id="pass" placeholder="Password"><br>
-<input type="tel" id="hp" placeholder="No HP"><br>
+<input id="user" placeholder="Username"><br>
+<input id="pass" type="password" placeholder="Password"><br>
+<input id="hp" placeholder="No HP"><br>
 
 <div class="captcha" id="captcha"></div><br>
-<input type="text" id="capInput" placeholder="Masukkan kode captcha"><br>
+<input id="capInput" placeholder="Masukkan Captcha"><br>
 
 <button onclick="daftar()">DAFTAR & MASUK</button>
 </div>
 
-<!-- GAME SLOT -->
+<!-- GAME -->
 <div id="game">
-<h3>Saldo Demo: <span id="saldo">1000</span> Koin</h3>
+<h3>Saldo Demo: <span id="saldo">10000</span> Koin</h3>
 
-<div class="slot-box" id="s1">🍒</div>
-<div class="slot-box" id="s2">🍋</div>
-<div class="slot-box" id="s3">🔔</div><br>
+<div class="reel" id="r1">🍒</div>
+<div class="reel" id="r2">🍋</div>
+<div class="reel" id="r3">🔔</div>
 
+<br>
 <button onclick="spin()">🎰 SPIN</button>
 </div>
+
+<div id="popup"></div>
+
+<!-- SOUND -->
+<audio id="spinSound" src="https://www.soundjay.com/mechanical/slot-machine-1.mp3"></audio>
+<audio id="winSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
 
 <script>
 // CAPTCHA
 let kode="";
 function buatCaptcha(){
-  kode = Math.random().toString(36).substring(2,7);
-  document.getElementById("captcha").innerHTML=kode;
+ kode=Math.random().toString(36).substring(2,7);
+ document.getElementById("captcha").innerHTML=kode;
 }
 buatCaptcha();
 
-// FORM DAFTAR
+// DAFTAR
 function daftar(){
-  let u=document.getElementById("user").value;
-  let p=document.getElementById("pass").value;
-  let h=document.getElementById("hp").value;
-  let c=document.getElementById("capInput").value;
-
-  if(u==""||p==""||h==""){alert("Isi semua data!");return;}
-  if(c!=kode){alert("Captcha salah!");buatCaptcha();return;}
-
-  alert("Akun berhasil dibuat: "+u);
-  document.getElementById("form").style.display="none";
-  document.getElementById("game").style.display="block";
+ let u=user.value,p=pass.value,h=hp.value,c=capInput.value;
+ if(!u||!p||!h){alert("Isi semua data");return;}
+ if(c!=kode){alert("Captcha salah");buatCaptcha();return;}
+ alert("Akun dibuat: "+u);
+ form.style.display="none";
+ game.style.display="block";
 }
 
-// SLOT ENGINE
-let simbol=["🍒","🍋","🔔","💎","🍉","7️⃣"];
+// SLOT SYMBOL
+let simbol=["🍒","🍋","🔔","💎","🍉","7️⃣","⭐"];
+let reels=["r1","r2","r3"];
+
 function spin(){
- let s1=simbol[Math.floor(Math.random()*simbol.length)];
- let s2=simbol[Math.floor(Math.random()*simbol.length)];
- let s3=simbol[Math.floor(Math.random()*simbol.length)];
- document.getElementById("s1").innerHTML=s1;
- document.getElementById("s2").innerHTML=s2;
- document.getElementById("s3").innerHTML=s3;
-
+ spinSound.play();
  let saldo=parseInt(document.getElementById("saldo").innerHTML);
- saldo-=10;
+ saldo-=50;
+ if(saldo<=0) saldo=10000;
 
- if(s1==s2 && s2==s3){
-   alert("🔥 JACKPOT BANJAR RAYA 🔥");
-   saldo+=500;
- }
+ let interval=setInterval(()=>{
+   reels.forEach(id=>{
+     document.getElementById(id).innerHTML=simbol[Math.floor(Math.random()*simbol.length)];
+   });
+ },100);
 
- if(saldo<=0){saldo=1000;}
+ setTimeout(()=>{
+   clearInterval(interval);
+   let s1=r1.innerHTML,s2=r2.innerHTML,s3=r3.innerHTML;
 
- document.getElementById("saldo").innerHTML=saldo;
+   if(s1==s2 && s2==s3){
+     winSound.play();
+     alert("🔥 JACKPOT BANJAR RAYA 🔥");
+     saldo+=5000;
+   }
+   document.getElementById("saldo").innerHTML=saldo;
+ },2000);
 }
+
+// FAKE WIN POPUP
+let nama=["Budi","Andi","Rizal","Dewi","Putri","Agus"];
+setInterval(()=>{
+ let n=nama[Math.floor(Math.random()*nama.length)];
+ let win=Math.floor(Math.random()*9000)+1000;
+ popup.innerHTML="💰 "+n+" menang "+win+" Koin!";
+ popup.style.display="block";
+ setTimeout(()=>popup.style.display="none",3000);
+},8000);
 </script>
 
 </body>
